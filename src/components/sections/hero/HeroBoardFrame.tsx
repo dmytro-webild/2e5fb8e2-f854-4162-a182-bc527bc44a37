@@ -4,7 +4,7 @@ import { List } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import MakroTitle from "@/components/kit/MakroTitle";
-import { MotionMedia } from "@/components/kit/Media";
+import ScreenRecorderWidget from "@/components/kit/ScreenRecorderWidget";
 
 const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -77,8 +77,6 @@ const HeroBoardFrame = ({
   description,
   primaryButton,
   secondaryButton,
-  imageSrc,
-  imageAlt = "",
   kpis = [],
   introDelay = 0,
   ariaLabel,
@@ -88,7 +86,6 @@ const HeroBoardFrame = ({
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.6 });
-  const imageY = useTransform(progress, [0, 1], ["0%", reduce ? "0%" : "5%"]);
 
   const appear = (y: number, delay: number) =>
     reduce ? {} : { initial: { opacity: 0, y }, animate: { opacity: 1, y: 0 }, transition: { ...spring, delay: delay + introDelay } };
@@ -145,23 +142,15 @@ const HeroBoardFrame = ({
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.01, delay: introDelay + BOARD_AT }}
-          className="rounded-[var(--radius-card)] bg-card p-[clamp(0.375rem,1vw,0.75rem)]"
+          className="rounded-[var(--radius-card)] bg-transparent p-0"
         >
           <motion.div
             initial={reduce ? false : { opacity: 0, clipPath: "inset(6% 6% 6% 6% round 16px)" }}
             animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0% round 16px)" }}
             transition={{ ...calm, delay: introDelay + BOARD_AT }}
-            className="aspect-[4/3] overflow-hidden rounded-[var(--radius-image)] sm:aspect-[16/10] lg:aspect-[16/9]"
+            className="overflow-hidden rounded-[var(--radius-card)] shadow-2xl"
           >
-            <MotionMedia
-              src={imageSrc}
-              alt={imageAlt}
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-              style={{ y: imageY, scale: 1.12 }}
-              className="size-full object-cover"
-            />
+            <ScreenRecorderWidget />
           </motion.div>
         </motion.div>
         {kpis.slice(0, 3).map((kpi, i) => (
