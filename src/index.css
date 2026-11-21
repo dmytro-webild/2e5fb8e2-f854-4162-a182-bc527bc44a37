@@ -9,15 +9,15 @@
 
 /* webild:theme-ai */
 :root {
-  --primary-cta: #f2eee6;
-  --primary-cta-text: #171512;
-  --secondary-cta: #221f1b;
-  --secondary-cta-text: #f2eee6;
-  --background-accent: #ffb36b;
+  --primary-cta: #ededf0;
+  --primary-cta-text: #15161a;
+  --secondary-cta: #1f2025;
+  --secondary-cta-text: #ededf0;
+  --background-accent: #d9ff5c;
 
-  --background: #171512;
-  --foreground: #f2eee6;
-  --card: #221f1b;
+  --background: #15161a;
+  --foreground: #ededf0;
+  --card: #1f2025;
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
@@ -25,15 +25,15 @@
   --primary-foreground: var(--primary-cta-text);
   --secondary: var(--secondary-cta);
   --secondary-foreground: var(--secondary-cta-text);
-  --muted: #1c1a17;
-  --muted-foreground: #b0a898;
+  --muted: #1a1b20;
+  --muted-foreground: #a3a4aa;
   --accent: var(--background-accent);
-  --accent-foreground: #26231d;
-  --deep: #2f2b26;
+  --accent-foreground: #242426;
+  --deep: #2a2b31;
   --deep-foreground: #ffffff;
   --destructive: #e5484d;
   --destructive-foreground: #161616;
-  --border: #36312b;
+  --border: #2c2e34;
   --input: #d8dde5;
   --ring: var(--primary-cta);
 
@@ -324,12 +324,12 @@
 
   [data-tone="deep"] {
     --foreground: var(--deep-foreground);
-    --muted-foreground: #b0a898;
+    --muted-foreground: #a3a4aa;
   }
 
   [data-tone="deep"] :is(.bg-card, .kit-card) {
     --foreground: var(--card-foreground);
-    --muted-foreground: #b0a898;
+    --muted-foreground: #a3a4aa;
   }
 
   [data-tone="deep"] .btn-primary {
