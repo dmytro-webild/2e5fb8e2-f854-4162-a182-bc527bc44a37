@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { List } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
@@ -123,14 +124,26 @@ const HeroBoardFrame = ({
         {(primaryButton || secondaryButton) && (
           <motion.div {...appear(48, 0.6)} className="mt-[clamp(1.75rem,3.4vw,3rem)] flex flex-wrap items-center justify-center gap-x-[1rem] gap-y-[1.25rem]">
             {primaryButton && (
-              <a href={primaryButton.href} className="btn-primary btn-lg">
-                {primaryButton.text}
-              </a>
+              primaryButton.href.startsWith('/') ? (
+                <Link to={primaryButton.href} className="btn-primary btn-lg">
+                  {primaryButton.text}
+                </Link>
+              ) : (
+                <a href={primaryButton.href} className="btn-primary btn-lg">
+                  {primaryButton.text}
+                </a>
+              )
             )}
             {secondaryButton && (
-              <a href={secondaryButton.href} className="btn-secondary btn-lg bg-card">
-                {secondaryButton.text}
-              </a>
+              secondaryButton.href.startsWith('/') ? (
+                <Link to={secondaryButton.href} className="btn-secondary btn-lg bg-card">
+                  {secondaryButton.text}
+                </Link>
+              ) : (
+                <a href={secondaryButton.href} className="btn-secondary btn-lg bg-card">
+                  {secondaryButton.text}
+                </a>
+              )
             )}
           </motion.div>
         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import useMenuDialog from "@/components/kit/useMenuDialog";
 
@@ -80,9 +81,15 @@ const NavbarFloatingPill = ({ brand, logoSrc, navItems, cta, menuText = "Menu", 
 
           <div className="flex shrink-0 items-center gap-[0.5rem]">
             {cta && (
-              <a href={cta.href} className="btn-secondary btn-nav btn-sm hidden lg:inline-flex">
-                {cta.text}
-              </a>
+              cta.href.startsWith('/') ? (
+                <Link to={cta.href} className="btn-secondary btn-nav btn-sm hidden lg:inline-flex">
+                  {cta.text}
+                </Link>
+              ) : (
+                <a href={cta.href} className="btn-secondary btn-nav btn-sm hidden lg:inline-flex">
+                  {cta.text}
+                </a>
+              )
             )}
             <button
               type="button"
@@ -141,9 +148,15 @@ const NavbarFloatingPill = ({ brand, logoSrc, navItems, cta, menuText = "Menu", 
                   ))}
                 </div>
                 {cta && (
-                  <a href={cta.href} onClick={() => setOpen(false)} className="btn-primary self-start lg:hidden">
-                    {cta.text}
-                  </a>
+                  cta.href.startsWith('/') ? (
+                    <Link to={cta.href} onClick={() => setOpen(false)} className="btn-primary self-start lg:hidden">
+                      {cta.text}
+                    </Link>
+                  ) : (
+                    <a href={cta.href} onClick={() => setOpen(false)} className="btn-primary self-start lg:hidden">
+                      {cta.text}
+                    </a>
+                  )
                 )}
               </div>
             </motion.div>

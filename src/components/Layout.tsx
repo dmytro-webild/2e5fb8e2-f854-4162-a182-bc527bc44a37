@@ -1,8 +1,19 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import NavbarFloatingPill from "@/components/navbars/NavbarFloatingPill";
 import FooterTrayWordmark from "@/components/sections/footer/FooterTrayWordmark";
 
 export default function Layout() {
+  const location = useLocation();
+  const isApp = location.pathname.startsWith("/app");
+
+  if (isApp) {
+    return (
+      <main className="min-h-svh bg-background text-foreground overflow-hidden">
+        <Outlet />
+      </main>
+    );
+  }
+
   return (
     <div className="relative isolate min-h-svh flex flex-col bg-background text-foreground" data-button="chip" data-card="tray" data-pattern="glow">
       <header data-webild-section="Header">
@@ -27,8 +38,8 @@ export default function Layout() {
             }
           ]}
           cta={{
-            text: "Start taking notes",
-            href: "#statement-dark-panel-board-1"
+            text: "Launch App",
+            href: "/app"
           }}
           introDelay={1.2}
         />
@@ -45,16 +56,16 @@ export default function Layout() {
               title: "Product",
               links: [
                 {
+                  text: "Launch Workspace App",
+                  href: "/app"
+                },
+                {
                   text: "Note-taking engine",
                   href: "#product"
                 },
                 {
                   text: "Workspace preview",
                   href: "#gallery-tilt-cards"
-                },
-                {
-                  text: "Overview",
-                  href: "#home"
                 }
               ]
             },
@@ -71,7 +82,7 @@ export default function Layout() {
                 },
                 {
                   text: "Get started",
-                  href: "#statement-dark-panel-board-1"
+                  href: "/app"
                 }
               ]
             },

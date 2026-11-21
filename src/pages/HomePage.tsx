@@ -26,8 +26,12 @@ export default function HomePage() {
           title="Watch the lecture. Let AI write the notes."
           description="NoteAI captures audio, visual text, and slides automatically to generate clean, printable study notes."
           primaryButton={{
-            text: "Try NoteAI free",
-            href: "#statement-dark-panel-board-1"
+            text: "Get Started",
+            href: "/app"
+          }}
+          secondaryButton={{
+            text: "Launch App",
+            href: "/app"
           }}
           imageSrc="https://img.b2bpic.net/free-photo/3d-futuristic-abstract-low-poly-design_1048-12155.jpg"
           imageAlt="abstract digital network design"
@@ -323,8 +327,8 @@ export default function HomePage() {
         <StatementDarkPanelBoard
           title="Ready to automate your note taking?"
           primaryCta={{
-            text: "Start free trial",
-            href: "#home"
+            text: "Launch Workspace",
+            href: "/app"
           }}
           secondaryCta={{
             text: "Contact support",
