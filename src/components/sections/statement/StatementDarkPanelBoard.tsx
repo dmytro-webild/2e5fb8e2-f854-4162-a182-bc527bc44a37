@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useImageReady } from "@/components/kit/kitMotion";
 import { clsx, type ClassValue } from "clsx";
@@ -66,13 +67,25 @@ const StatementDarkPanelBoard = ({ title, primaryCta, secondaryCta, imageSrc, im
             transition={{ ...SPRING, delay: 0.1 }}
             className="mt-[clamp(2rem,4vw,3rem)] flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center"
           >
-            <a href={primaryCta.href} className="btn-primary btn-lime btn-lg sm:min-w-[12rem]">
-              {primaryCta.text}
-            </a>
-            {secondaryCta && (
-              <a href={secondaryCta.href} className="btn-secondary btn-lg sm:min-w-[12rem]">
-                {secondaryCta.text}
+            {primaryCta.href.startsWith('/') ? (
+              <Link to={primaryCta.href} className="btn-primary btn-lime btn-lg sm:min-w-[12rem]">
+                {primaryCta.text}
+              </Link>
+            ) : (
+              <a href={primaryCta.href} className="btn-primary btn-lime btn-lg sm:min-w-[12rem]">
+                {primaryCta.text}
               </a>
+            )}
+            {secondaryCta && (
+              secondaryCta.href.startsWith('/') ? (
+                <Link to={secondaryCta.href} className="btn-secondary btn-lg sm:min-w-[12rem]">
+                  {secondaryCta.text}
+                </Link>
+              ) : (
+                <a href={secondaryCta.href} className="btn-secondary btn-lg sm:min-w-[12rem]">
+                  {secondaryCta.text}
+                </a>
+              )
             )}
           </motion.div>
         </div>
