@@ -18,12 +18,17 @@ import HistoryView from '../components/workspace/HistoryView';
 import SettingsView from '../components/workspace/SettingsView';
 import ScreenGlowEffect from '../components/workspace/ScreenGlowEffect';
 import CommandPaletteModal from '../components/workspace/CommandPaletteModal';
+import NewSessionModal from '../components/workspace/NewSessionModal';
 
 export default function WorkspacePage() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('dictate');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('notebooks');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentWorkspace, setCurrentWorkspace] = useState('Personal Workspace');
   const [activeMode, setActiveMode] = useState<ContextMode>('youtube');
+
+  // New Session Modal State
+  const [isNewSessionOpen, setIsNewSessionOpen] = useState(false);
+  const [selectedNbForSession, setSelectedNbForSession] = useState<string | null>(null);
 
   // Recording State
   const [isRecording, setIsRecording] = useState(false);
@@ -315,6 +320,10 @@ export default function WorkspacePage() {
           isRecording={isRecording}
           isProcessing={isProcessing}
           onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenNewSession={() => {
+            setSelectedNbForSession(null);
+            setIsNewSessionOpen(true);
+          }}
           onExport={handleExport}
         />
 
@@ -354,6 +363,10 @@ export default function WorkspacePage() {
             <NotebooksView
               notebooks={notebooks}
               notes={notes}
+              onOpenNewSession={(nbId) => {
+                setSelectedNbForSession(nbId || null);
+                setIsNewSessionOpen(true);
+              }}
               onCreateNotebook={(name, description, color) => {
                 const newNb: NotebookFolder = {
                   id: `nb-${Date.now()}`,
@@ -404,6 +417,40 @@ export default function WorkspacePage() {
           )}
         </main>
       </div>
+
+      {/* New Recording Session Wizard Modal */}
+      <NewSessionModal
+        isOpen={isNewSessionOpen}
+        onClose={() => setIsNewSessionOpen(false)}
+        notebooks={notebooks}
+        initialNotebookId={selectedNbForSession}
+        onCreateNotebook={(name, description, color) => {
+          const newNb: NotebookFolder = {
+            id: `nb-${Date.now()}`,
+            name,
+            description,
+            color,
+            icon: 'Folder',
+            noteCount: 0,
+            createdAt: new Date().toISOString(),
+          };
+          setNotebooks((prev) => [...prev, newNb]);
+          return newNb;
+        }}
+        onSaveNewNote={(newNote) => {
+          setNotes((prev) => [newNote, ...prev]);
+          setPolishedText(newNote.polishedText);
+          setRawTranscript(newNote.rawTranscript);
+          setNoteTitle(newNote.title);
+          setActiveMode(newNote.mode);
+          setActiveTab('notebooks');
+
+          // Increment notebook note count
+          setNotebooks((prev) =>
+            prev.map((nb) => (nb.id === newNote.notebookId ? { ...nb, noteCount: nb.noteCount + 1 } : nb))
+          );
+        }}
+      />
     </div>
   );
 }

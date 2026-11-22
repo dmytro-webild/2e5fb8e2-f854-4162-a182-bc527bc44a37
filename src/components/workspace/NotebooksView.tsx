@@ -19,6 +19,7 @@ interface NotebooksViewProps {
   onDeleteNote: (noteId: string) => void;
   onUpdateNote: (note: NoteItem) => void;
   onExportNote: (note: NoteItem, format: 'markdown' | 'text' | 'print') => void;
+  onOpenNewSession?: (notebookId?: string) => void;
 }
 
 const PRESET_COLORS = ['#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899'];
@@ -31,6 +32,7 @@ export default function NotebooksView({
   onDeleteNote,
   onUpdateNote,
   onExportNote,
+  onOpenNewSession,
 }: NotebooksViewProps) {
   const [selectedNotebookId, setSelectedNotebookId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -71,13 +73,25 @@ export default function NotebooksView({
             <BookOpen className="size-5 text-primary" />
             <h2 className="text-base font-bold text-foreground">Notebook Folders</h2>
           </div>
-          <button
-            onClick={() => setIsCreatingNb(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity shadow-sm"
-          >
-            <Plus className="size-3.5" />
-            <span>New Folder</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {onOpenNewSession && (
+              <button
+                onClick={() => onOpenNewSession(selectedNotebookId || undefined)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity shadow-sm"
+              >
+                <Plus className="size-3.5" />
+                <span>New Session</span>
+              </button>
+            )}
+            <button
+              onClick={() => setIsCreatingNb(true)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-muted text-foreground text-xs font-semibold hover:bg-muted/80 transition-colors border border-border"
+              title="Create New Folder"
+            >
+              <Plus className="size-3.5" />
+              <span>Folder</span>
+            </button>
+          </div>
         </div>
 
         {/* Folder Cards Grid */}

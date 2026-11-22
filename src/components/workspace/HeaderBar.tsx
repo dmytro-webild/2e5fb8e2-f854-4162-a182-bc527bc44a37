@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Download, Sparkles, FileText, FileCode, Printer, Check, Radio } from 'lucide-react';
+import { Search, Download, Sparkles, FileText, FileCode, Printer, Check, Radio, Plus } from 'lucide-react';
 import type { ContextMode } from '../../types/workspace';
 
 interface HeaderBarProps {
@@ -8,6 +8,7 @@ interface HeaderBarProps {
   isRecording: boolean;
   isProcessing: boolean;
   onOpenSearch: () => void;
+  onOpenNewSession: () => void;
   onExport: (format: 'markdown' | 'text' | 'print') => void;
 }
 
@@ -24,6 +25,7 @@ export default function HeaderBar({
   isRecording,
   isProcessing,
   onOpenSearch,
+  onOpenNewSession,
   onExport,
 }: HeaderBarProps) {
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -79,60 +81,70 @@ export default function HeaderBar({
         </kbd>
       </button>
 
-      {/* Right Action Menu: Download / Export */}
-      <div className="relative">
+      {/* Right Action Menu: New Session & Export */}
+      <div className="flex items-center gap-2">
         <button
-          onClick={() => setIsExportOpen(!isExportOpen)}
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground font-medium text-xs hover:opacity-90 transition-opacity shadow-sm"
+          onClick={onOpenNewSession}
+          className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:opacity-90 transition-opacity shadow-sm cursor-pointer"
         >
-          <Download className="size-3.5" />
-          <span>Export Note</span>
+          <Plus className="size-4" />
+          <span>New Session</span>
         </button>
 
-        {exportedFormat && (
-          <div className="absolute right-0 top-full mt-2 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium shadow-lg flex items-center gap-1.5 z-50">
-            <Check className="size-3.5" />
-            <span className="capitalize">Exported as {exportedFormat}!</span>
-          </div>
-        )}
+        <div className="relative">
+          <button
+            onClick={() => setIsExportOpen(!isExportOpen)}
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-card border border-border hover:bg-muted text-foreground font-medium text-xs transition-colors shadow-sm"
+          >
+            <Download className="size-3.5 text-muted-foreground" />
+            <span>Export</span>
+          </button>
 
-        {isExportOpen && (
-          <div className="absolute right-0 top-full mt-2 w-56 p-1.5 bg-card border border-border shadow-2xl rounded-2xl z-50 space-y-1">
-            <p className="px-2.5 py-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-              Select Export Format
-            </p>
-            <button
-              onClick={() => handleExportClick('markdown')}
-              className="flex items-center gap-2.5 w-full px-2.5 py-2 text-xs font-medium rounded-xl hover:bg-muted text-foreground transition-colors text-left"
-            >
-              <FileCode className="size-4 text-sky-500" />
-              <div>
-                <p className="font-semibold">Markdown (.md)</p>
-                <p className="text-[10px] text-muted-foreground">Clean formatted text for Obsidian & Notion</p>
-              </div>
-            </button>
-            <button
-              onClick={() => handleExportClick('text')}
-              className="flex items-center gap-2.5 w-full px-2.5 py-2 text-xs font-medium rounded-xl hover:bg-muted text-foreground transition-colors text-left"
-            >
-              <FileText className="size-4 text-emerald-500" />
-              <div>
-                <p className="font-semibold">Plain Text (.txt)</p>
-                <p className="text-[10px] text-muted-foreground">Raw transcript & cleaned output</p>
-              </div>
-            </button>
-            <button
-              onClick={() => handleExportClick('print')}
-              className="flex items-center gap-2.5 w-full px-2.5 py-2 text-xs font-medium rounded-xl hover:bg-muted text-foreground transition-colors text-left"
-            >
-              <Printer className="size-4 text-purple-500" />
-              <div>
-                <p className="font-semibold">Printable PDF View</p>
-                <p className="text-[10px] text-muted-foreground">Formatted study sheet for exam printing</p>
-              </div>
-            </button>
-          </div>
-        )}
+          {exportedFormat && (
+            <div className="absolute right-0 top-full mt-2 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium shadow-lg flex items-center gap-1.5 z-50">
+              <Check className="size-3.5" />
+              <span className="capitalize">Exported as {exportedFormat}!</span>
+            </div>
+          )}
+
+          {isExportOpen && (
+            <div className="absolute right-0 top-full mt-2 w-56 p-1.5 bg-card border border-border shadow-2xl rounded-2xl z-50 space-y-1">
+              <p className="px-2.5 py-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                Select Export Format
+              </p>
+              <button
+                onClick={() => handleExportClick('markdown')}
+                className="flex items-center gap-2.5 w-full px-2.5 py-2 text-xs font-medium rounded-xl hover:bg-muted text-foreground transition-colors text-left"
+              >
+                <FileCode className="size-4 text-sky-500" />
+                <div>
+                  <p className="font-semibold">Markdown (.md)</p>
+                  <p className="text-[10px] text-muted-foreground">Clean formatted text for Obsidian & Notion</p>
+                </div>
+              </button>
+              <button
+                onClick={() => handleExportClick('text')}
+                className="flex items-center gap-2.5 w-full px-2.5 py-2 text-xs font-medium rounded-xl hover:bg-muted text-foreground transition-colors text-left"
+              >
+                <FileText className="size-4 text-emerald-500" />
+                <div>
+                  <p className="font-semibold">Plain Text (.txt)</p>
+                  <p className="text-[10px] text-muted-foreground">Raw transcript & cleaned output</p>
+                </div>
+              </button>
+              <button
+                onClick={() => handleExportClick('print')}
+                className="flex items-center gap-2.5 w-full px-2.5 py-2 text-xs font-medium rounded-xl hover:bg-muted text-foreground transition-colors text-left"
+              >
+                <Printer className="size-4 text-purple-500" />
+                <div>
+                  <p className="font-semibold">Printable PDF View</p>
+                  <p className="text-[10px] text-muted-foreground">Formatted study sheet for exam printing</p>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

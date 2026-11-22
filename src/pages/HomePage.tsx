@@ -29,10 +29,6 @@ export default function HomePage() {
             text: "Get Started",
             href: "/app"
           }}
-          secondaryButton={{
-            text: "Launch App",
-            href: "/app"
-          }}
           imageSrc="https://img.b2bpic.net/free-photo/3d-futuristic-abstract-low-poly-design_1048-12155.jpg"
           imageAlt="abstract digital network design"
           introDelay={1.2}
@@ -327,7 +323,7 @@ export default function HomePage() {
         <StatementDarkPanelBoard
           title="Ready to automate your note taking?"
           primaryCta={{
-            text: "Launch Workspace",
+            text: "Get Started",
             href: "/app"
           }}
           secondaryCta={{
