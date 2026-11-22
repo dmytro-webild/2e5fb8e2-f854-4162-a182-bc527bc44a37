@@ -38,7 +38,7 @@ export default function Layout() {
             }
           ]}
           cta={{
-            text: "Launch App",
+            text: "Get Started",
             href: "/app"
           }}
           introDelay={1.2}
@@ -56,7 +56,7 @@ export default function Layout() {
               title: "Product",
               links: [
                 {
-                  text: "Launch Workspace App",
+                  text: "Get Started",
                   href: "/app"
                 },
                 {
