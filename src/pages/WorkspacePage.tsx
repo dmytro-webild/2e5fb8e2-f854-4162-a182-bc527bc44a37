@@ -19,6 +19,9 @@ import SettingsView from '../components/workspace/SettingsView';
 import ScreenGlowEffect from '../components/workspace/ScreenGlowEffect';
 import CommandPaletteModal from '../components/workspace/CommandPaletteModal';
 import NewSessionModal from '../components/workspace/NewSessionModal';
+import PermissionModal from '../components/workspace/PermissionModal';
+import FaintedCountdownOverlay from '../components/workspace/FaintedCountdownOverlay';
+import SavedConfirmationModal from '../components/workspace/SavedConfirmationModal';
 
 export default function WorkspacePage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('notebooks');
@@ -29,6 +32,21 @@ export default function WorkspacePage() {
   // New Session Modal State
   const [isNewSessionOpen, setIsNewSessionOpen] = useState(false);
   const [selectedNbForSession, setSelectedNbForSession] = useState<string | null>(null);
+
+  // Permission & Countdown Modal States
+  const [hasPermission, setHasPermission] = useState(false);
+  const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
+  const [isCountdownActive, setIsCountdownActive] = useState(false);
+  const [selectedTargetNbId, setSelectedTargetNbId] = useState<string>('');
+
+  // Confirmation Pop-up State upon stopping
+  const [savedConfirmationData, setSavedConfirmationData] = useState<{
+    noteTitle: string;
+    notebookName: string;
+    notebookColor: string;
+    duration: number;
+    wordCount: number;
+  } | null>(null);
 
   // Recording State
   const [isRecording, setIsRecording] = useState(false);
@@ -46,6 +64,13 @@ export default function WorkspacePage() {
   const [notebooks, setNotebooks] = useState<NotebookFolder[]>(INITIAL_NOTEBOOKS);
   const [notes, setNotes] = useState<NoteItem[]>(INITIAL_NOTES);
   const [history, setHistory] = useState<DictationHistoryItem[]>(INITIAL_HISTORY);
+
+  // Initialize selected target notebook ID
+  useEffect(() => {
+    if (notebooks.length > 0 && !selectedTargetNbId) {
+      setSelectedTargetNbId(notebooks[0].id);
+    }
+  }, [notebooks, selectedTargetNbId]);
 
   // Preferences State
   const [settings, setSettings] = useState<WorkspaceSettings>({
@@ -70,7 +95,7 @@ export default function WorkspacePage() {
     setFillerCount(formatted.fillerWordsRemoved);
   }, [activeMode, rawTranscript]);
 
-  // Timer Effect
+  // Timer Effect (Only ticks while isRecording is true)
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     if (isRecording) {
@@ -83,7 +108,28 @@ export default function WorkspacePage() {
     };
   }, [isRecording]);
 
-  // Handle Stop Recording with Siri Edge Glow Transition
+  // Continuous Real-Time Screen Content Note Append Effect
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+    if (isRecording) {
+      timer = setInterval(() => {
+        setRawTranscript((prev) => {
+          const additions = [
+            ' Note: Key formula slide OCR detected on screen.',
+            ' [Timestamp]: Instructor explained positional embeddings.',
+            ' Summary point: Multi-modal AI sync reduces study time by 80%.',
+          ];
+          const nextAddition = additions[Math.floor(Math.random() * additions.length)];
+          return prev + nextAddition;
+        });
+      }, 4000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isRecording]);
+
+  // Handle Stop Recording with Siri Edge Glow Transition & Confirmation Pop-up
   const stopRecording = useCallback(() => {
     setIsRecording(false);
     setIsGlowing(true);
@@ -114,9 +160,10 @@ export default function WorkspacePage() {
       setIsGlowing(false);
       setIsProcessing(false);
 
-      // Create new note & history item
+      // Save note to chosen/active notebook
       const newNoteId = `note-${Date.now()}`;
-      const targetNbId = notebooks[0]?.id || 'nb-general';
+      const targetNb = notebooks.find((nb) => nb.id === selectedTargetNbId) || notebooks[0];
+      const targetNbId = targetNb?.id || 'nb-general';
 
       const newNote: NoteItem = {
         id: newNoteId,
@@ -152,10 +199,24 @@ export default function WorkspacePage() {
       setNotebooks((prev) =>
         prev.map((nb) => (nb.id === targetNbId ? { ...nb, noteCount: nb.noteCount + 1 } : nb))
       );
-    }, 1200);
-  }, [recordingSeconds, activeMode, rawTranscript, notebooks]);
 
-  const startRecording = useCallback(() => {
+      // Display Confirmation Pop-up
+      setSavedConfirmationData({
+        noteTitle: formatted.title,
+        notebookName: targetNb?.name || 'General Workspace',
+        notebookColor: targetNb?.color || '#3b82f6',
+        duration: Math.max(recordingSeconds, 15),
+        wordCount: spokenText.split(' ').length,
+      });
+    }, 1200);
+  }, [recordingSeconds, activeMode, rawTranscript, notebooks, selectedTargetNbId]);
+
+  const startCountdownAndRecording = useCallback(() => {
+    setIsCountdownActive(true);
+  }, []);
+
+  const handleCountdownComplete = useCallback(() => {
+    setIsCountdownActive(false);
     setIsRecording(true);
     setRecordingSeconds(0);
   }, []);
@@ -164,9 +225,13 @@ export default function WorkspacePage() {
     if (isRecording) {
       stopRecording();
     } else {
-      startRecording();
+      if (!hasPermission) {
+        setIsPermissionModalOpen(true);
+      } else {
+        startCountdownAndRecording();
+      }
     }
-  }, [isRecording, stopRecording, startRecording]);
+  }, [isRecording, stopRecording, hasPermission, startCountdownAndRecording]);
 
   // Keyboard Shortcuts Listener (Spacebar, Alt+V, Cmd+K)
   useEffect(() => {
@@ -254,6 +319,7 @@ export default function WorkspacePage() {
 
   // Save active note to chosen notebook
   const handleSaveToNotebook = (notebookId: string) => {
+    setSelectedTargetNbId(notebookId);
     const existing = notes.find((n) => n.title === noteTitle);
     if (existing) {
       setNotes((prev) =>
@@ -277,10 +343,49 @@ export default function WorkspacePage() {
     }
   };
 
+  const currentNotebook = notebooks.find((n) => n.id === selectedTargetNbId) || notebooks[0];
+
   return (
-    <div className="flex h-svh w-screen bg-background text-foreground overflow-hidden">
+    <div className="flex h-svh w-screen bg-background text-foreground overflow-hidden relative">
       {/* Siri / Circle-to-Search Viewport Screen Glow Sweep Animation */}
       <ScreenGlowEffect isGlowing={isGlowing && settings.glowEffectEnabled} glowStyle={settings.glowStyle} />
+
+      {/* Screen Access Permission Modal */}
+      <PermissionModal
+        isOpen={isPermissionModalOpen}
+        onClose={() => setIsPermissionModalOpen(false)}
+        notebooks={notebooks}
+        selectedNotebookId={selectedTargetNbId}
+        onSelectNotebook={setSelectedTargetNbId}
+        onGrantPermission={() => {
+          setHasPermission(true);
+          setIsPermissionModalOpen(false);
+          startCountdownAndRecording();
+        }}
+      />
+
+      {/* 3-Second Fainted Screen Countdown Overlay */}
+      <FaintedCountdownOverlay
+        isOpen={isCountdownActive}
+        onCountdownComplete={handleCountdownComplete}
+        title={`Capturing Screen Content (${activeMode.toUpperCase()})`}
+        notebookName={currentNotebook?.name}
+      />
+
+      {/* Saved Confirmation Pop-up Modal upon stopping recording */}
+      <SavedConfirmationModal
+        isOpen={!!savedConfirmationData}
+        onClose={() => setSavedConfirmationData(null)}
+        noteTitle={savedConfirmationData?.noteTitle || ''}
+        notebookName={savedConfirmationData?.notebookName || ''}
+        notebookColor={savedConfirmationData?.notebookColor}
+        durationSeconds={savedConfirmationData?.duration}
+        wordCount={savedConfirmationData?.wordCount}
+        onViewNotes={() => {
+          setSavedConfirmationData(null);
+          setActiveTab('notebooks');
+        }}
+      />
 
       {/* Cmd + K Search Command Palette Modal */}
       <CommandPaletteModal
